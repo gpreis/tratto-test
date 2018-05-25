@@ -72,15 +72,6 @@ RSpec.describe Money do
         expect { money.credit(deposit) }.to change { money.amount }.by(deposit.amount)
       end
     end
-
-    context 'precision should 6 decimals' do
-      it 'should ignore the 7 decimal' do
-        money = Money.new(currency: :brl, amount: 10)
-        deposit = Money.new(currency: :brl, amount: '1.0000009')
-
-        expect { money.credit(deposit) }.to change { money.amount }.by(1)
-      end
-    end
   end
 
   describe '#debit' do
@@ -93,13 +84,29 @@ RSpec.describe Money do
       end
     end
 
-    context 'precision should 6 decimals' do
-      it 'should ignore the 7 decimal' do
-        money = Money.new(currency: :brl, amount: 10)
-        withdraw = Money.new(currency: :brl, amount: '1.0000009')
+    context 'when tries to withdraw more than the current balance' do
+      it 'should raise InsufficientFundsError' do
+        money = Money.new(currency: :usd, amount: 10)
+        withdraw = Money.new(currency: :usd, amount: '12')
 
-        expect { money.debit(withdraw) }.to change { money.amount }.by(-1)
+        expect { money.debit(withdraw) }.to raise_error(Error::InsufficientFundsError)
       end
+    end
+  end
+
+  describe '#amount' do
+    it 'should return the amount with only the first 4 decimals' do
+      money = Money.new(currency: :usd, amount: '42.1234567')
+
+      expect(money.amount).to eq 42.1234
+    end
+  end
+
+  describe '#raw_amount' do
+    it 'should return the amount with as much precision as possible' do
+      money = Money.new(currency: :usd, amount: '42.1234567')
+
+      expect(money.raw_amount).to eq 42.1234567
     end
   end
 
