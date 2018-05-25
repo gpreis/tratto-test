@@ -21,19 +21,23 @@ class Money
   def credit(money)
     converted = convert_to_self_currency(money)
 
-    @amount += converted.amount
+    @amount += converted.amount.floor(6)
   end
 
   def debit(money)
     converted = convert_to_self_currency(money)
     raise InsufficientFundsError if self < converted
 
-    @amount -= converted.amount
+    @amount -= converted.amount.floor(6)
   end
 
   def <=>(other)
     raise Error::IncomparableCurrencyError unless currency == other.currency
     amount <=> other.amount
+  end
+
+  def human_amount
+    amount.floor(2).to_f
   end
 
   private

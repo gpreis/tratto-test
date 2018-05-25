@@ -72,6 +72,15 @@ RSpec.describe Money do
         expect { money.credit(deposit) }.to change { money.amount }.by(deposit.amount)
       end
     end
+
+    context 'precision should 6 decimals' do
+      it 'should ignore the 7 decimal' do
+        money = Money.new(currency: :brl, amount: 10)
+        deposit = Money.new(currency: :brl, amount: '1.0000009')
+
+        expect { money.credit(deposit) }.to change { money.amount }.by(1)
+      end
+    end
   end
 
   describe '#debit' do
@@ -82,6 +91,23 @@ RSpec.describe Money do
 
         expect { money.debit(withdraw) }.to change { money.amount }.by(-withdraw.amount)
       end
+    end
+
+    context 'precision should 6 decimals' do
+      it 'should ignore the 7 decimal' do
+        money = Money.new(currency: :brl, amount: 10)
+        withdraw = Money.new(currency: :brl, amount: '1.0000009')
+
+        expect { money.debit(withdraw) }.to change { money.amount }.by(-1)
+      end
+    end
+  end
+
+  describe '#human_amount' do
+    it 'should return a float with two decimals rouding down' do
+      money = Money.new(currency: :usd, amount: 72.1199)
+
+      expect(money.human_amount).to equal(72.11)
     end
   end
 end
