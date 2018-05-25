@@ -3,8 +3,8 @@ require_relative '../money'
 
 module Error
   class InvalidCurrencyError < CustomError
-    def initialize(currency='informed currency')
-      super("The #{currency} is not valid. Use one of #{Money::CURRENCY_SYMBOLS}")
+    def initialize(currency = 'The informed currency')
+      super("#{currency} is not valid. Use one of #{Money::CURRENCY_SYMBOLS}")
     end
   end
 end
