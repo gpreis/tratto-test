@@ -35,7 +35,7 @@ RSpec.describe MoneyExchangeService do
         precision  = '%.6f'
 
         expect(to_reais.currency).to eq(:brl)
-        expect(precision % to_reais.amount).to eq(precision % from_reais.amount)
+        expect(format(precision, to_reais.amount)).to eq(format(precision, from_reais.amount))
       end
     end
 
