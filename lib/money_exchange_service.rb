@@ -25,13 +25,13 @@ class MoneyExchangeService
   end
 
   def in_base_currency
-    @in_base_currency ||= money.amount / rates(money.currency)
+    @in_base_currency ||= money.raw_amount / rates(money.currency)
   end
 
   def amount_to(currency)
     case currency
     when money.currency
-      money.amount
+      money.raw_amount
     when BASE_CURRENCY
       in_base_currency
     else
