@@ -1,3 +1,4 @@
+require_relative 'error/insufficient_funds_error'
 require_relative 'error/invalid_currency_error'
 require_relative 'error/incomparable_currency_error'
 require_relative 'money_exchange_service'
@@ -7,13 +8,15 @@ class Money
   include Comparable
 
   CURRENCY_SYMBOLS = %i[usd eur brl].freeze
-  BIG_DECIMAL_PRECISION = 12
+  BIG_DECIMALS     = 16
+  DECIMALS         = 4
+  HUMAN_DECIMALS   = 2
 
-  attr_reader :currency, :amount
+  attr_reader :currency
 
   def initialize(args)
     @currency = args.fetch(:currency)
-    @amount = BigDecimal(args.fetch(:amount), BIG_DECIMAL_PRECISION)
+    @amount = BigDecimal(args.fetch(:amount), BIG_DECIMALS)
 
     validate_currency!
   end
@@ -21,14 +24,14 @@ class Money
   def credit(money)
     converted = convert_to_self_currency(money)
 
-    @amount += converted.amount.floor(6)
+    @amount += converted.amount
   end
 
   def debit(money)
     converted = convert_to_self_currency(money)
-    raise InsufficientFundsError if self < converted
+    raise(Error::InsufficientFundsError, converted) if self < converted
 
-    @amount -= converted.amount.floor(6)
+    @amount -= converted.amount
   end
 
   def <=>(other)
@@ -37,7 +40,15 @@ class Money
   end
 
   def human_amount
-    amount.floor(2).to_f
+    amount.floor(HUMAN_DECIMALS).to_f
+  end
+
+  def amount
+    @amount.floor(DECIMALS)
+  end
+
+  def raw_amount
+    @amount
   end
 
   private
