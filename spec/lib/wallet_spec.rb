@@ -45,4 +45,56 @@ RSpec.describe Wallet do
       expect(subject.keys).to_not include(:brl)
     end
   end
+
+  describe '#to_credit' do
+    context 'when the wallet has the requested currency wallet' do
+      it 'should return it' do
+        params = { name: 'jon', eur: 71 }
+        wallet = Wallet.new(params)
+        eur    = Money.new(currency: :eur, amount: 71)
+
+        expect(wallet.to_credit(:eur)).to eq eur
+      end
+    end
+
+    context 'when the wallet doenst have the requested currency wallet' do
+      it 'should return the first that is found on the wallet' do
+        params = { name: 'jon', brl: 71 }
+        wallet = Wallet.new(params)
+        brl    = Money.new(currency: :brl, amount: 71)
+
+        expect(wallet.to_credit(:usd)).to eq brl
+      end
+    end
+
+    context 'when wallet is empty' do
+      it 'should return nil' do
+        params = { name: 'jon' }
+        wallet = Wallet.new(params)
+
+        expect(wallet.to_credit(:usd)).to be_nil
+      end
+    end
+  end
+
+  describe '#to_debit' do
+    context 'when the wallet has the requested currency wallet' do
+      it 'should return it' do
+        params = { name: 'jon', eur: 71 }
+        wallet = Wallet.new(params)
+        eur    = Money.new(currency: :eur, amount: 71)
+
+        expect(wallet.to_debit(:eur)).to eq eur
+      end
+    end
+
+    context 'when the wallet doenst have the requested currency wallet' do
+      it 'should return the first that is found on the wallet' do
+        params = { name: 'jon', brl: 71 }
+        wallet = Wallet.new(params)
+
+        expect(wallet.to_debit(:usd)).to be_nil
+      end
+    end
+  end
 end
